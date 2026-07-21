@@ -37,6 +37,9 @@ const server = setupServer(
         created_at: new Date().toISOString(),
       })
     );
+  }),
+  rest.delete('/api/items/:id', (req, res, ctx) => {
+    return res(ctx.status(204));
   })
 );
 
@@ -50,7 +53,7 @@ describe('App Component', () => {
     await act(async () => {
       render(<App />);
     });
-    expect(screen.getByText('React Frontend with Node Backend')).toBeInTheDocument();
+    expect(screen.getByText('Hello World')).toBeInTheDocument();
     expect(screen.getByText('Connected to in-memory database')).toBeInTheDocument();
   });
 
@@ -95,6 +98,26 @@ describe('App Component', () => {
     // Check that the new item appears
     await waitFor(() => {
       expect(screen.getByText('New Test Item')).toBeInTheDocument();
+    });
+  });
+
+  test('deletes an item', async () => {
+    const user = userEvent.setup();
+
+    await act(async () => {
+      render(<App />);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('Test Item 1')).toBeInTheDocument();
+    });
+
+    await act(async () => {
+      await user.click(screen.getAllByText('Delete')[0]);
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByText('Test Item 1')).not.toBeInTheDocument();
     });
   });
 
